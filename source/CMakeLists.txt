@@ -1,10 +1,17 @@
 # Turbo Vision sources.
 
+include(GNUInstallDirs)
+
 file(GLOB_RECURSE TVSOURCE "${CMAKE_CURRENT_LIST_DIR}/*/*.cpp")
 list(REMOVE_ITEM TVSOURCE "${CMAKE_CURRENT_LIST_DIR}/tvision/geninc.cpp")
 
 add_library(${PROJECT_NAME} STATIC ${TVSOURCE})
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+
+# ABI version
+# http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html
+set(SONAME 1)
+set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION ${SONAME} VERSION ${SONAME}.0.0)
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
 
@@ -138,14 +145,14 @@ tv_set_output_dir(${PROJECT_NAME})
 #
 install(TARGETS ${PROJECT_NAME}
     EXPORT ${PROJECT_NAME}-config
-    ARCHIVE DESTINATION lib
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     COMPONENT library
 )
 
 # package configuration
 
 install(EXPORT ${PROJECT_NAME}-config
-    DESTINATION lib/cmake/${PROJECT_NAME}
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/${PROJECT_NAME}
     NAMESPACE ${PROJECT_NAME}::
     FILE ${PROJECT_NAME}-config.cmake
     COMPONENT library
